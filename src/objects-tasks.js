@@ -35,12 +35,7 @@ function shallowCopy(obj) {
  *    mergeObjects([]) => {}
  */
 function mergeObjects(objects) {
-  if (!objects.length) {
-    return {};
-  }
-  const newObj = {};
-  for (let i = 0; i < objects[0].length)
-  return newObj;
+  return objects;
 }
 
 /**
@@ -113,8 +108,8 @@ function isEmptyObject(obj) {
  *    immutableObj.newProp = 'new';
  *    console.log(immutableObj) => {a: 1, b: 2}
  */
-function makeImmutable(/* obj */) {
-  throw new Error('Not implemented');
+function makeImmutable(obj) {
+  return Object.freeze(obj);
 }
 
 /**
@@ -274,8 +269,13 @@ function sortCitiesArray(arr) {
  *    "Poland" => ["Lodz"]
  *   }
  */
-function group(/* array, keySelector, valueSelector */) {
-  throw new Error('Not implemented');
+function group(array) {
+  array
+    .sort((a, b) => (a.city[0] < b.city[0] ? 1 : -1))
+    .sort((a, b) => (a.country > b.country ? 1 : -1));
+  const newObj = {};
+
+  return newObj;
 }
 
 /**
