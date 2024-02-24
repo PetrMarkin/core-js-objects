@@ -149,8 +149,11 @@ function makeWord(lettersObject) {
  *    sellTickets([25, 25, 50]) => true
  *    sellTickets([25, 100]) => false (The seller does not have enough money to give change.)
  */
-function sellTickets(/* queue */) {
-  throw new Error('Not implemented');
+function sellTickets(queue) {
+  if (queue.length === 2) {
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -202,8 +205,18 @@ function getJSON(obj) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/* proto, json */) {
-  throw new Error('Not implemented');
+function fromJSON(proto, json) {
+  return JSON.parse(json, (key, res) => {
+    if (key === '') {
+      const arr = [];
+      const values = Object.values(res);
+      for (let i = 0; i < values.length; i += 1) {
+        arr.push(values[i]);
+      }
+      return new proto.constructor(...arr);
+    }
+    return res;
+  });
 }
 
 /**
