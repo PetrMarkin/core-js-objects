@@ -35,7 +35,18 @@ function shallowCopy(obj) {
  *    mergeObjects([]) => {}
  */
 function mergeObjects(objects) {
-  return objects;
+  const newObj = {};
+  for (let i = 0; i < objects.length; i += 1) {
+    Object.entries(objects[i]).forEach((e) => {
+      const [key, value] = e;
+      if (newObj[key]) {
+        newObj[key] += value;
+      } else {
+        newObj[key] = value;
+      }
+    });
+  }
+  return newObj;
 }
 
 /**
@@ -282,13 +293,16 @@ function sortCitiesArray(arr) {
  *    "Poland" => ["Lodz"]
  *   }
  */
-function group(array) {
-  array
-    .sort((a, b) => (a.city[0] < b.city[0] ? 1 : -1))
-    .sort((a, b) => (a.country > b.country ? 1 : -1));
-  const newObj = {};
-
-  return newObj;
+function group(array, keySelector, valueSelector) {
+  const map = new Map();
+  array.forEach((obj) => {
+    if (!map.has(keySelector(obj))) {
+      map.set(keySelector(obj), [valueSelector(obj)]);
+    } else {
+      map.get(keySelector(obj)).push(valueSelector(obj));
+    }
+  });
+  return map;
 }
 
 /**
@@ -346,32 +360,66 @@ function group(array) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  res: '',
+  element(value) {
+    this.error(1);
+    const newObj = Object.create(cssSelectorBuilder);
+    newObj.i = 1;
+    newObj.res = this.res + value;
+    return newObj;
   },
-
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    this.error(2);
+    const newObj = Object.create(cssSelectorBuilder);
+    newObj.i = 2;
+    newObj.res = `${this.res}#${value}`;
+    return newObj;
   },
-
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    this.error(3);
+    const newObj = Object.create(cssSelectorBuilder);
+    newObj.i = 3;
+    newObj.res = `${this.res}.${value}`;
+    return newObj;
   },
-
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    this.error(4);
+    const newObj = Object.create(cssSelectorBuilder);
+    newObj.i = 4;
+    newObj.res = `${this.res}[${value}]`;
+    return newObj;
   },
-
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    this.error(5);
+    const newObj = Object.create(cssSelectorBuilder);
+    newObj.i = 5;
+    newObj.res = `${this.res}:${value}`;
+    return newObj;
   },
-
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    this.error(6);
+    const newObj = Object.create(cssSelectorBuilder);
+    newObj.i = 6;
+    newObj.res = `${this.res}::${value}`;
+    return newObj;
   },
-
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    const newObj = Object.create(cssSelectorBuilder);
+    newObj.res = `${selector1.res} ${combinator} ${selector2.res}`;
+    return newObj;
+  },
+  stringify() {
+    return this.res;
+  },
+  error(newi) {
+    if (this.i > newi)
+      throw new Error(
+        'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element'
+      );
+    if (this.i === newi && (newi === 1 || newi === 2 || newi === 6))
+      throw new Error(
+        'Element, id and pseudo-element should not occur more then one time inside the selector'
+      );
   },
 };
 
